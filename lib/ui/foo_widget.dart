@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_guide_render/ui/custom_column_widget.dart';
 import 'package:flutter_guide_render/ui/custom_expanded_widget.dart';
@@ -11,17 +12,29 @@ class FooWidget extends StatefulWidget {
   State<FooWidget> createState() => _FooWidgetState();
 }
 
-class _FooWidgetState extends State<FooWidget> with TickerProviderStateMixin {
+class _FooWidgetState extends State<FooWidget>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 2),
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const CustomColumnWidget(
+    return CustomColumnWidget(
       alignment: CustomColumnAlignment.center,
       children: [
-        CustomExpandedWidget(
+        const CustomExpandedWidget(
           flex: 2,
           child: SizedBox(),
         ),
-        Padding(
+        const Padding(
           padding: EdgeInsets.all(16),
           child: Text(
             'A definitive guide to\n '
@@ -31,16 +44,28 @@ class _FooWidgetState extends State<FooWidget> with TickerProviderStateMixin {
             ),
           ),
         ),
-        Padding(
+        const Padding(
           padding: EdgeInsets.all(16),
           child: Text(
             'by CreativeCreatorOrMaybeNot',
           ),
         ),
-        CustomBoxWidget(
-          flex: 3,
-          color: Color(0xafdf32a4),
-        ),
+        AnimatedBuilder(
+            animation: _controller,
+            builder: (_, __) {
+              return CustomBoxWidget(
+                flex: 3,
+                color: const Color(0xafdf32a4),
+                rotation: _controller.value * 2 * math.pi,
+                onTap: () {
+                  if (_controller.isAnimating) {
+                    _controller.stop();
+                  } else {
+                    _controller.repeat();
+                  }
+                },
+              );
+            }),
       ],
     );
   }

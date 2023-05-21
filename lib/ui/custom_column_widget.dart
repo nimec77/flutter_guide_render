@@ -151,6 +151,16 @@ class RenderCustomColumn extends RenderBox
     return width;
   }
 
+  @override
+  double? computeDistanceToActualBaseline(TextBaseline baseline) {
+    return defaultComputeDistanceToFirstActualBaseline(baseline);
+  }
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
+    return defaultHitTestChildren(result, position: position);
+  }
+
   Size _performLayout({
     required BoxConstraints constraints,
     required bool dry,
