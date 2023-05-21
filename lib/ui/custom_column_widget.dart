@@ -3,12 +3,30 @@ import 'dart:math' as math;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+enum CustomColumnAlignment {
+  start,
+  end,
+  center,
+}
+
 class CustomColumnWidget extends MultiChildRenderObjectWidget {
-  const CustomColumnWidget({super.key, super.children = const []});
+  final CustomColumnAlignment alignment;
+
+  const CustomColumnWidget({
+    super.key,
+    super.children = const [],
+    this.alignment = CustomColumnAlignment.center,
+  });
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    return RenderCustomColumn();
+    return RenderCustomColumn(alignment: alignment);
+  }
+
+  @override
+  void updateRenderObject(
+      BuildContext context, RenderCustomColumn renderObject) {
+    renderObject.alignment = alignment;
   }
 }
 
@@ -20,6 +38,22 @@ class RenderCustomColumn extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, CustomColumnParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, CustomColumnParentData> {
+  RenderCustomColumn({
+    required CustomColumnAlignment alignment,
+  }) : _alignment = alignment;
+
+  CustomColumnAlignment _alignment;
+
+  CustomColumnAlignment get alignment => _alignment;
+  set alignment(CustomColumnAlignment value) {
+    if (alignment == value) {
+      return;
+    }
+
+    _alignment = value;
+    markNeedsLayout();
+  }
+
   @override
   void setupParentData(covariant RenderObject child) {
     if (child.parentData is! CustomColumnParentData) {
@@ -35,7 +69,12 @@ class RenderCustomColumn extends RenderBox
     var childOffset = const Offset(0, 0);
     while (child != null) {
       final childParentData = child.parentData as CustomColumnParentData;
-      childParentData.offset = Offset(0, childOffset.dy);
+      final dx = switch (alignment) {
+        CustomColumnAlignment.start => 0.0,
+        CustomColumnAlignment.end => size.width - child.size.width,
+        CustomColumnAlignment.center => (size.width - child.size.width) / 2,
+      };
+      childParentData.offset = Offset(dx, childOffset.dy);
       childOffset += Offset(0, child.size.height);
 
       child = childParentData.nextSibling;
@@ -50,6 +89,66 @@ class RenderCustomColumn extends RenderBox
   @override
   Size computeDryLayout(BoxConstraints constraints) {
     return _performLayout(constraints: constraints, dry: true);
+  }
+
+  @override
+  double computeMinIntrinsicHeight(double width) {
+    var height = 0.0;
+
+    var child = firstChild;
+    while (child != null) {
+      final childParentData = child.parentData as CustomColumnParentData;
+      height += child.getMinIntrinsicHeight(width);
+
+      child = childParentData.nextSibling;
+    }
+
+    return height;
+  }
+
+  @override
+  double computeMaxIntrinsicHeight(double width) {
+    var height = 0.0;
+
+    var child = firstChild;
+    while (child != null) {
+      final childParentData = child.parentData as CustomColumnParentData;
+      height += child.getMaxIntrinsicHeight(width);
+
+      child = childParentData.nextSibling;
+    }
+
+    return height;
+  }
+
+  @override
+  double computeMinIntrinsicWidth(double height) {
+    var width = 0.0;
+
+    var child = firstChild;
+    while (child != null) {
+      final childParentData = child.parentData as CustomColumnParentData;
+      width = math.max(width, child.getMinIntrinsicWidth(height));
+
+      child = childParentData.nextSibling;
+    }
+
+    return width;
+  }
+
+  @override
+  double computeMaxIntrinsicWidth(double height) {
+    var width = 0.0;
+
+    var child = firstChild;
+    while (child != null) {
+      final childParentData = child.parentData as CustomColumnParentData;
+      width = math.max(width, child.getMaxIntrinsicWidth(height));
+
+      child = childParentData.nextSibling;
+    }
+
+    return width;
   }
 
   Size _performLayout({
