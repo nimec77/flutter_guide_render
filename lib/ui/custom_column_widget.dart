@@ -45,6 +45,7 @@ class RenderCustomColumn extends RenderBox
   CustomColumnAlignment _alignment;
 
   CustomColumnAlignment get alignment => _alignment;
+
   set alignment(CustomColumnAlignment value) {
     if (alignment == value) {
       return;

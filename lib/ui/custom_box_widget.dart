@@ -94,6 +94,7 @@ class RenderCustomBox extends RenderBox {
     }
 
     _onTap = value;
+    markNeedsSemanticsUpdate();
     _tapGestureRecognizer.onTap = value;
   }
 
@@ -125,6 +126,15 @@ class RenderCustomBox extends RenderBox {
   void detach() {
     _tapGestureRecognizer.dispose();
     super.detach();
+  }
+
+  @override
+  void describeSemanticsConfiguration(SemanticsConfiguration config) {
+    config
+      ..isButton = true
+      ..textDirection = TextDirection.ltr
+      ..label = 'CustomBoxWidget'
+      ..onTap = onTap;
   }
 
   @override
