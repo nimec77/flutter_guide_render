@@ -15,6 +15,7 @@ class _FooWidgetState extends State<FooWidget> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return const CustomColumnWidget(
+      alignment: CustomColumnAlignment.center,
       children: [
         CustomExpandedWidget(
           flex: 2,

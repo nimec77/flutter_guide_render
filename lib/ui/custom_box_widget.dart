@@ -16,6 +16,13 @@ class CustomBoxWidget extends LeafRenderObjectWidget {
   RenderObject createRenderObject(BuildContext context) {
     return RenderCustomBox(flex: flex, color: color);
   }
+
+  @override
+  void updateRenderObject(BuildContext context, RenderCustomBox renderObject) {
+    renderObject
+      ..flex = flex
+      ..color = color;
+  }
 }
 
 class RenderCustomBox extends RenderBox {
@@ -29,8 +36,26 @@ class RenderCustomBox extends RenderBox {
         _color = color;
 
   int get flex => _flex;
+  set flex(int value) {
+    assert(value >= 0);
+    if (flex == value) {
+      return;
+    }
+
+    _flex = value;
+    parentData!.flex = _flex;
+    markParentNeedsLayout();
+  }
 
   Color get color => _color;
+  set color(Color value) {
+    if (color == value) {
+      return;
+    }
+
+    _color = value;
+    markNeedsPaint();
+  }
 
   @override
   CustomColumnParentData? get parentData {
