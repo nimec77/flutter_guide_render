@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_guide_render/ui/custom_column_widget.dart';
 import 'package:flutter_guide_render/ui/custom_expanded_widget.dart';
+import 'package:flutter_guide_render/ui/custom_proxy_widget.dart';
 
 import 'custom_box_widget.dart';
 
@@ -27,45 +28,57 @@ class _FooWidgetState extends State<FooWidget>
 
   @override
   Widget build(BuildContext context) {
-    return CustomColumnWidget(
-      alignment: CustomColumnAlignment.center,
+    return Stack(
       children: [
-        const CustomExpandedWidget(
-          flex: 2,
-          child: SizedBox(),
+        CustomColumnWidget(
+          alignment: CustomColumnAlignment.center,
+          children: [
+            const CustomExpandedWidget(
+              flex: 2,
+              child: SizedBox(),
+            ),
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'A definitive guide to\n '
+                'RendreObejext in Flutter',
+                style: TextStyle(
+                  fontSize: 32,
+                ),
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'by CreativeCreatorOrMaybeNot',
+              ),
+            ),
+            AnimatedBuilder(
+                animation: _controller,
+                builder: (_, __) {
+                  return CustomBoxWidget(
+                    flex: 3,
+                    color: const Color(0xafdf32a4),
+                    rotation: _controller.value * 2 * math.pi,
+                    onTap: () {
+                      if (_controller.isAnimating) {
+                        _controller.stop();
+                      } else {
+                        _controller.repeat();
+                      }
+                    },
+                  );
+                }),
+          ],
         ),
-        const Padding(
-          padding: EdgeInsets.all(16),
-          child: Text(
-            'A definitive guide to\n '
-            'RendreObejext in Flutter',
-            style: TextStyle(
-              fontSize: 32,
+        CustomProxyWidget(
+          child: SizedBox.expand(
+            child: Image.network(
+              'https://upload.wikimedia.org/wikipedia/commons/9/9a/National_Gallery_from_SW%2C_Canberra_Australia.jpg',
+              fit: BoxFit.cover,
             ),
           ),
         ),
-        const Padding(
-          padding: EdgeInsets.all(16),
-          child: Text(
-            'by CreativeCreatorOrMaybeNot',
-          ),
-        ),
-        AnimatedBuilder(
-            animation: _controller,
-            builder: (_, __) {
-              return CustomBoxWidget(
-                flex: 3,
-                color: const Color(0xafdf32a4),
-                rotation: _controller.value * 2 * math.pi,
-                onTap: () {
-                  if (_controller.isAnimating) {
-                    _controller.stop();
-                  } else {
-                    _controller.repeat();
-                  }
-                },
-              );
-            }),
       ],
     );
   }
